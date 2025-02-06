@@ -64,11 +64,11 @@ contract Raffle is VRFConsumerBaseV2Plus {
     constructor(
         uint256 enteranceFee,
         uint256 interval,
-        address vrfCCoordinator,
+        address vrfCoordinator,
         bytes32 gasLane,
         uint256 subscriptionId,
         uint32 callbackGasLimit
-    ) VRFConsumerBaseV2Plus(vrfCCoordinator) {
+    ) VRFConsumerBaseV2Plus(vrfCoordinator) {
         i_enteranceFee = enteranceFee;
         i_interval = interval;
         s_lastTimeStamp = block.timestamp;
