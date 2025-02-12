@@ -32,7 +32,7 @@ import {VRFV2PlusClient} from "@chainlink/contracts/src/v0.8/vrf/dev/libraries/V
  */
 contract Raffle is VRFConsumerBaseV2Plus {
     /** Errors */
-    error Raffle_SendMoreToEnterRaffle();
+    error Raffle__SendMoreToEnterRaffle();
     error Raffle_TransferFailed();
     error Raffle__RaffleNotOpen();
     error Raffle__UpkeepNotNeeded(
@@ -81,7 +81,7 @@ contract Raffle is VRFConsumerBaseV2Plus {
     function enterRaffle() external payable {
         //require(msg.value >= i_enteranceFee, "Not Enough ETH Sent");
         if (msg.value < i_enteranceFee) {
-            revert Raffle_SendMoreToEnterRaffle();
+            revert Raffle__SendMoreToEnterRaffle();
         }
         if (s_raffleState != RaffleState.OPEN) {
             revert Raffle__RaffleNotOpen();
@@ -175,5 +175,9 @@ contract Raffle is VRFConsumerBaseV2Plus {
 
     function getRaffleState() external view returns (RaffleState) {
         return s_raffleState;
+    }
+
+    function getPlayer(uint256 indexOfPlayer) external view returns (address) {
+        return s_players[indexOfPlayer];
     }
 }
