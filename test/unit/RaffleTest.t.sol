@@ -68,4 +68,48 @@ contract RaffleTest is Test {
         vm.prank(PLAYER);
         raffle.enterRaffle{value: enteranceFee}();
     }
+
+    function testCheckUpKeepReturnsFalseIfItHasNoBalance() public {
+        vm.warp(block.timestamp + interval + 1);
+        vm.roll(block.number + 1);
+        (bool upKeepNeeded, ) = raffle.checkUpkeep("");
+        assert(!upKeepNeeded);
+    }
+
+    function testCheckUpKeepReturnsFalseIfRaffleIsnotOpen() public {
+        vm.prank(PLAYER);
+        raffle.enterRaffle{value: enteranceFee}();
+        vm.warp(block.timestamp + interval + 1);
+        vm.roll(block.number + 1);
+        raffle.performUpkeep("");
+        (bool upKeepNeeded, ) = raffle.checkUpkeep("");
+        assert(!upKeepNeeded);
+    }
+
+    function testPerformUpKeepCanOnlyRunIfCheckUpKeepIsTrue() public {
+        vm.prank(PLAYER);
+        raffle.enterRaffle{value: enteranceFee}();
+        vm.warp(block.timestamp + interval + 1);
+        vm.roll(block.number + 1);
+        raffle.performUpkeep("");
+    }
+
+    function testPerformUpKeepRevertsIfCheckUpKeepIsFalse() public {
+        uint256 currentBalance = 0;
+        uint256 numPlayers = 0;
+        Raffle.RaffleState rState = raffle.getRaffleState();
+        vm.prank(PLAYER);
+        raffle.enterRaffle{value: enteranceFee}();
+        currentBalance = currentBalance + enteranceFee;
+        numPlayers = 1;
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                Raffle.Raffle__UpkeepNotNeeded.selector,
+                currentBalance,
+                numPlayers,
+                rState
+            )
+        );
+        raffle.performUpkeep("");
+    }
 }
